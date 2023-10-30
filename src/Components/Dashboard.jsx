@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux"
 import {logout} from '../Slices/authSlice'
  
 const Dashboard = () => {
-    const localinfo =  JSON.parse(localStorage.getItem("localInfo"));
+    const localToken =  JSON.parse(localStorage.getItem("localToken"));
     const navigate = useNavigate();
     const dispatch = useDispatch()
     
@@ -12,15 +12,15 @@ const Dashboard = () => {
     const logoutbtn =()=>{
         dispatch(logout())
         localStorage.clear();
-        if(localStorage.getItem("localInfo") === null){
+        if(localStorage.getItem("localToken") === null){
             navigate("/login")
         }
     }
    
-    if(localinfo !== null){
+    if(localToken !== null){
         return(
             <>
-                <h1>Dashboard - {localinfo.username}</h1>
+                <h1>Dashboard - {localToken}</h1>
                 <button onClick={logoutbtn} className="btn btn-danger">Logout</button>
             </>
         )

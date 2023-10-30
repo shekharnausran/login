@@ -1,37 +1,51 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import axios from 'axios'
+import { isLogin } from '../Components/isLogin';
  
-
-export const fetchData = createAsyncThunk('auth/fetchContent',
-   async (user) => {
-        const url = 'https://dummyjson.com/auth/login';
+// Fetch login data
+export const fetchData = createAsyncThunk('auth',
+   async (userr) => {
+        const url = 'http://localhost:5000/user/signin';
         const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            data: userr
+        }
+        const response = await axios(url, config)
+        const data = await response.data
+        return data
+        
+    }
+)
+
+// Register new user
+export const registerUser = createAsyncThunk('auth',
+   async (user) => {
+        const url = 'http://localhost:5000/user/add';
+        const config = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*' },
             data: user
         }
         const response = await axios(url, config)
         const data = await response.data
-        console.log(data)
         return data
         
     }
-    )
+)
 
 export const authSlice = createSlice({
     name : "auth",
     initialState : {
         user: null,
         isLoading : false,
-        isAuthenticated : false
+        isAuthenticated : false,
     },
     reducers : {
         logout : (state)=>{
-            //console.log("localStorage==",localStorage);
+            localStorage.clear();
             state.isAuthenticated = false
             state.user = null
-            localStorage.clear();
-            //console.log("localStorage==",localStorage);
         }
     },
     extraReducers: (builder) => {
@@ -39,12 +53,10 @@ export const authSlice = createSlice({
           state.isLoading = true
         })
         builder.addCase(fetchData.fulfilled, (state, action) => {
-          state.isAuthenticated = true
-          state.isLoading = false
           state.user = action.payload
-          localStorage.setItem("localInfo", JSON.stringify(state.user));
-          
-          //alert(JSON.stringify(state.user))
+          localStorage.setItem("localToken", JSON.stringify(action.payload.token));
+          state.isAuthenticated = isLogin()
+          state.isLoading = false
         })
         builder.addCase(fetchData.rejected, (state, action) => {
           state.isLoading = false
